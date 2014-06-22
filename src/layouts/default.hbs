@@ -4,7 +4,11 @@
   <title>{{ current.title }}</title>
   <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet">
   <link href='http://fonts.googleapis.com/css?family=Patua+One' rel='stylesheet' type='text/css'>
-  <link href="/assets/css/main.css" rel="stylesheet" />
+  
+  {{#each stylesheets.items}}
+    <link href="{{$path}}" rel="stylesheet" />
+  {{/each}}
+  
   <!--[if lt IE 9]>
     <script src="//oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
     <script src="//oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
@@ -15,7 +19,7 @@
 
   <div class="navbar navbar-inverse navbar-fixed-top">
     <div class="container">
-      <a class="navbar-brand logo" href="/">Stacktic</a>
+      <a class="navbar-brand logo" href="{{$root}}">Stacktic</a>
       {{> 'nav'}}
     </div>
   </div>
@@ -46,6 +50,10 @@
 {{/if}}
   </div>
 {{> 'footer' }}
-  <script src="/assets/js/main.js"></script>
+
+{{#each scripts.items}}
+  <script src="{{$path}}"></script>
+{{/each}}
+  
 </body>
 </html>

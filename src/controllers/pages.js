@@ -4,7 +4,7 @@ module.exports = function(stacktic) {
   
   stacktic
   .controller('Pages', function() {
-    this.context.version = fs.readFileSync('node_modules/stacktic/package.json', {encoding: 'utf8'}).version;
+    this.context.version = JSON.parse(fs.readFileSync('node_modules/stacktic/package.json', {encoding: 'utf8'})).version;
     
     this.context.nav = this.models.Page.where({
       nav: true

@@ -2,19 +2,29 @@ module.exports = function(stacktic) {
 
   stacktic
   .controller('Assets', function() {
-
-    this.route("/assets/css/main.css", this.models.Assets.where({
+    this.context.stylesheets = this.models.Assets.where({
       $fs: {
         basename: 'main.less'
       }
-    })).render('less');
-    
-    this.route("/assets/js/main.js", this.models.Assets.where({
+    });
+
+    this.context.scripts = this.models.Assets.where({
       $fs: {
         basename: 'main.js'
       }
-    })).render('hbs', { layout: false });
+    });
 
+    this.route("/assets/css/main.css", this.context.stylesheets).render('less', {
+      compress: stacktic.config.get('minify')
+    });
+    
+    var jsRoute = this.route("/assets/js/main.js", this.context.scripts)
+    .render('hbs', { layout: false });
+    
+    if (stacktic.config.get('minify')) {
+      jsRoute.render('uglify');
+    }
+    
   });
 
 };

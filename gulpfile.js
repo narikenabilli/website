@@ -1,21 +1,22 @@
 var gulp   = require('gulp'),
-  stacktic = require('stacktic'),
+  stacktic = require('../stacktic'),
   connect  = require('gulp-connect'),
-  clean    = require('gulp-clean');
+  rimraf   = require('rimraf'),
+  deploy = require("gulp-gh-pages");
 
 gulp.on('err', function(e) {
   console.log(e.err.stack);
 });
 
-gulp.task('clean', function () {
-  gulp.src('out', {read: false})
-    .pipe(clean());
+gulp.task('clean', function (cb) {
+  rimraf('./out', cb);
 });
 
 gulp.task('stacktic', ['clean'], function(done) {
   stacktic({
     src: 'src',
     dest: 'out',
+    root: '/stacktic',
     less: {
       paths: ['bower_components', '_site/assets/less'],
       compress: false
@@ -44,6 +45,13 @@ gulp.task('livereload', function () {
 gulp.task('watch', function () {
   gulp.watch(['./out/*.html'], ['livereload']);
   gulp.watch(['./src/**/*'], ['stacktic']);
+});
+
+gulp.task('deploy', function () {
+    gulp.src("./out/stacktic/**/*")
+        .pipe(deploy({
+          remoteUrl: 'git@github.com:stackticjs/stacktic.git'
+        }));
 });
 
 gulp.task('default', ['connect', 'watch']);
