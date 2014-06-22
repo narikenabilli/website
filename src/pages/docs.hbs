@@ -1,0 +1,234 @@
+---
+title: Docs
+nav: true
+---
+
+{{#md }}
+
+A brand new Static Site Generator in a world full of Static Site Generators...
+Well the reason for that is simply: I was annoyed by any other of them. 
+
+Why? They relies on files too much, configuring routes is always a mess, managing assets is confusing as well, they are often coupled with rendering engines.
+
+So it happened that when I tryed to move a website from nanoc (the best I've tryied) to assemble.io I ended up to be frustrated enough to think "I had to fix this, no matter what". 
+
+Working with MVC frameworks I've learned clean architectures and patterns that correcty isolates responsabilities to create dynamic, data-driven websites. Why we can't have that for static sites too?
+
+### The right architecture first
+
+First of all. Static sites are composed by files, but data shouldn't be file centric and relying on files as datasources is not enough. I wish to use local and remote data, sort, paginate, query them to create complex logic and render them the way I need.
+
+The global architecture appears like that:
+
+Data
+
+Loaders
+
+Models 
+
+
+Controllers -> Routes + RenderingContexts -> Renderable -> Render
+
+
+
+## Loading phase and Models
+
+So data are loaded from different sources, they can be files or the result of a rest api call, as well as the result-set of a database query.
+
+Loaded data are stored in an internal, all-in-memory datasource composed of queryable collections of data.
+
+After the loading phase all of the data of the same type should be homogeneus and organized into collections called 'Models'. 
+
+Loaders are responsible to adapt data to a standard format. Collections are composed of items and items are javascript objects with some special, well-defined properties prefixed with `$` used during the build process plus user-defined properties and functions.
+
+``` js
+Stacktic = require('stacktic');
+
+Stacktic.model('Page', function(){
+  this.datasource = { protocol: 'file', path: 'pages/**' };
+  
+  this.yfm();
+  this.slug('title');
+  this.dates('created_at', 'updated_at');
+
+  this.instanceMethods = {
+    relatedPages: function(){
+      return Stacktic.models.Page.where({category: this.category});
+    }
+  };
+});
+```
+
+Loaders are protocol handlers, so Stacktic has a simpler way to express loaders options: an uri.
+
+``` js
+Stacktic.model('Page', function(){
+  this.datasource = "file:/pages/**";
+  
+  this.yfm();
+  this.slug('title');
+  this.dates('created_at', 'updated_at');
+
+  this.instanceMethods = {
+    relatedPages: function(){
+      return Stacktic.models.Page.where({category: this.category});
+    }
+  };
+});
+```
+
+The uri above is implicitly parsed with `url` and passed to loader registered as the uri protocol (except the `:`), in this case is the built-in `file` loader.
+
+#### Concatenation
+
+You can concatenate different sources to the same collection
+
+``` js
+this.datasource = ["file:/pages/**", "http://api.example.com/pages?author=me"]);
+```
+
+#### Datasources can be a function too
+
+``` js
+Stacktic.model('Version', function(){
+  this.datasource = function(options, cb){
+    cb(null, [{ $content: "1.2.4" }]);
+  };
+});
+```
+
+#### Postprocessing items
+
+Often items needs to be enriched or further adapted to match a specific format. For instance say that we want all page items to have a slug computed from title, or that we know the property 'created_at' of all items should be a `Date` instead of the `String` we loaded from a JSON thus we need to convert it.
+
+To perform these transformations we can either attach an handler to 'item:loaded' event or register and use a postprocessor.
+
+Postprocessors live in the loading phase and are responsible to perform transformation on item structures.
+
+A common postprocessor is YAML Front Matter parser (YFM). YFM will take an item `$content` property extract the YAML metadata into the item itself and rewrite `$content` stripped from YAML stuffs.
+
+
+``` js
+Stacktic.model('Page', function(){
+  this.datasource = "file:/pages/**";
+  
+  this.on('load', function(item){
+
+  });
+});
+```
+
+
+Postprocessors can be composed so that the result of a postprocessor is the input for a following one.
+
+``` js
+Stacktic = require('stacktic');
+Stacktic.use('stacktic-contrib-yfm');
+
+Stacktic.phase('load', function(){
+  this.load('pages', ["file:/pages/**"]).then('yfm').then('create_slug', {attr: "title"}).then('dates', {"attrs": ['created_at', 'updated_at']});
+});
+```
+
+`then` implements a sort of Promise interface and can take either a function or the pair `name, options` where name is the `name` of a registered function, and `options` are additional options that will be passed as the last arguments to the function itself.
+
+## 2. Logic Phase
+
+Well now we have all of our data organized in collections we can query, think about them like the __model__ part of an MVC frameworks.
+
+Well now we can go on with the logic phase that starts after all the items are loaded. In this phase we will instruct Stacktic on how to build stuffs.
+
+So first we will create a global context for the rendering phase. Then we bind items to their routes and in the end we trigger the rendering phase itself.
+
+``` js
+Stacktic.controller(function(){
+
+  this.context.set('myGlobalContextVar', 'a Value');
+
+  this.route('/', this.models.Page.where({slug: "home"}), function(){
+    // Build local context here
+
+    this.nav = this.models.Page.reject({slug: "home"});
+
+  }).render('hbs', {layout: "home"});
+
+});
+
+```
+
+Routing is the act of binding an item to its path
+
+
+
+# Build phases and Components
+
+## 1. Loading
+
+Loading phase takes place when the building starts. In this phase all'items are loaded from configured datasources.
+
+
+# Internal Item Attributes
+
+## $collection 
+
+The name of the collection this item belongs to.
+Available on 'item:loaded'
+
+## $raw
+
+The raw content of this item.
+Available on 'item:loaded'
+
+## $path 
+
+The route binding path of this item.
+Available on 'item:bind'
+
+## $rendered
+
+The rendered content of this item.
+Available for renderers after running a renderer against the item and on 'item:rendered'
+
+
+
+
+- Event driven
+- Asynchronous
+- Flexible
+
+{{!-- ## Phases
+
+### 1 - Load
+Components: Adapters
+
+### 2 - Define Logic: Build Context and setup Routes
+
+
+### 3 - Render
+Components: Renderers
+
+### 4 - Write
+Components: Writers
+
+ --}}
+
+
+### Built in loaders
+
+- file
+- http
+- https
+
+### Built in processors
+
+- yfm
+- slug
+- date
+
+### Built in renderers
+
+- hbs
+- md
+
+
+{{/md }}

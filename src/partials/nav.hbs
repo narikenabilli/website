@@ -1,0 +1,10 @@
+<ul class="nav navbar-nav navbar-right">
+  {{#each nav.items }}
+    {{#ifCurrent $path }}
+      <li class="active"><a href="{{$path}}">{{title}}</a></li>
+    {{else}}
+      <li><a href="{{$path}}">{{title}}</a></li>
+    {{/ifCurrent}}
+  {{/each}}
+  <li><a href="https://github.com/stackticjs/stacktic" target="blank"><i class="fa fa-github"></i> Sources</a></li>
+</ul>      

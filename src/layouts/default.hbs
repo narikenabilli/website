@@ -1,0 +1,51 @@
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>{{ current.title }}</title>
+  <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet">
+  <link href='http://fonts.googleapis.com/css?family=Patua+One' rel='stylesheet' type='text/css'>
+  <link href="/assets/css/main.css" rel="stylesheet" />
+  <!--[if lt IE 9]>
+    <script src="//oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+    <script src="//oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+  <![endif]-->
+
+</head>
+<body>
+
+  <div class="navbar navbar-inverse navbar-fixed-top">
+    <div class="container">
+      <a class="navbar-brand logo" href="/">Stacktic</a>
+      {{> 'nav'}}
+    </div>
+  </div>
+
+{{{ yield 'hero' }}}
+
+  <div class="container">
+{{#unless isHome}}
+<div class="page-header"><h1>{{$current.title}}</h1></div>
+{{/unless}}
+
+{{#if $current.toc}}
+<div class="row">
+  <div class="col-sm-3 sidebar-container">
+    <ul class="toc sidebar nav" id="toc">
+    </ul>
+  </div>
+  <div class="col-sm-9">
+<div class="content">
+{{{ yield }}}  
+</div>
+  </div>
+</div>
+{{else}}
+<div class="content">
+{{{ yield }}}  
+</div>
+{{/if}}
+  </div>
+{{> 'footer' }}
+  <script src="/assets/js/main.js"></script>
+</body>
+</html>
