@@ -16,6 +16,7 @@ gulp.task('stacktic', ['clean'], function(done) {
   stacktic({
     src: 'src',
     dest: 'out',
+    host: 'http://stackticjs.github.io/',
     root: '/stacktic',
     minify: true,
     less: {
@@ -29,6 +30,7 @@ gulp.task('stacktic', ['clean'], function(done) {
   .use('./src/models/font')
   .use('./src/controllers/pages')
   .use('./src/controllers/assets')
+  .use('./src/controllers/sitemap')
   .build(done);
 });
 
