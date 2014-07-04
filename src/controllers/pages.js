@@ -12,16 +12,16 @@ module.exports = function(stacktic) {
     
     this.route("/", this.models.Page.where({
       slug: "home"
-    })).render('hbs').render('toc', {
-      container: '.content',
-      levels: ['h2', 'h3']
-    }).context({
+    })).render('hbs').context({
       isHome: true
     });
 
     this.route("/:{$slug}/", this.models.Page.reject({
       slug: "home"
-    }));
+    })).render('hbs').render('toc', {
+      container: '.content',
+      levels: ['h2', 'h3']
+    });
 
   });
 

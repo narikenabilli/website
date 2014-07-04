@@ -24,6 +24,9 @@ module.exports = function(stacktic) {
     if (stacktic.config.get('minify')) {
       jsRoute.render('uglify');
     }
+
+    this.route("/assets/img/:{$fs.basename}", this.models.Image).render(false);
+    this.route("/assets/fonts/:{$fs.basename}", this.models.Font).render(false);
     
   });
 

@@ -1,10 +1,7 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>{{ current.title }}</title>
-  <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet">
-  <link href='http://fonts.googleapis.com/css?family=Patua+One' rel='stylesheet' type='text/css'>
-  
+  <title>{{ $current.title }}</title>  
   {{#each stylesheets.items}}
     <link href="{{$path}}" rel="stylesheet" />
   {{/each}}
@@ -17,19 +14,11 @@
 </head>
 <body>
 
-  <div class="navbar navbar-inverse navbar-fixed-top">
-    <div class="container">
-      <a class="navbar-brand logo" href="{{$root}}">Stacktic</a>
-      {{> 'nav'}}
-    </div>
-  </div>
+{{>'nav'}}
 
 {{{ yield 'hero' }}}
 
   <div class="container">
-{{#unless isHome}}
-<div class="page-header"><h1>{{$current.title}}</h1></div>
-{{/unless}}
 
 {{#if $current.toc}}
 <div class="row">
@@ -39,12 +28,20 @@
   </div>
   <div class="col-sm-9">
 <div class="content">
+{{#unless isHome}}
+<div class="page-header"><h1>{{$current.title}}</h1></div>
+{{/unless}}
+
 {{{ yield }}}  
 </div>
   </div>
 </div>
 {{else}}
 <div class="content">
+{{#unless isHome}}
+<div class="page-header"><h1>{{$current.title}}</h1></div>
+{{/unless}}
+
 {{{ yield }}}  
 </div>
 {{/if}}

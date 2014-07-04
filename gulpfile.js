@@ -17,14 +17,16 @@ gulp.task('stacktic', ['clean'], function(done) {
     src: 'src',
     dest: 'out',
     root: '/stacktic',
+    minify: true,
     less: {
-      paths: ['bower_components', '_site/assets/less'],
-      compress: false
+      paths: ['bower_components', '_site/assets/less']
     }
   })
   .use('./src/models/page')
   .use('./src/models/vendor')
+  .use('./src/models/image')
   .use('./src/models/asset')
+  .use('./src/models/font')
   .use('./src/controllers/pages')
   .use('./src/controllers/assets')
   .build(done);
